@@ -5,10 +5,12 @@ import {
   Get,
   HttpCode,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
+  ValidationPipe,
 } from '@nestjs/common';
-import { ICreateEventDto, IUpdateEventDto } from './event.dto';
+import { CreateEventDto, UpdateEventDto } from './event.dto';
 import { Event } from './event.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -26,12 +28,12 @@ export class EventsController {
   }
 
   @Get('/:id')
-  async findOne(@Param('id') id: string): Promise<Event> {
-    return await this.repository.findOneBy({ id: parseInt(id) });
+  async findOne(@Param('id', ParseIntPipe) id: number): Promise<Event> {
+    return await this.repository.findOneBy({ id });
   }
 
   @Post()
-  async create(@Body() body: ICreateEventDto): Promise<Event> {
+  async create(@Body() body: CreateEventDto): Promise<Event> {
     return await this.repository.save({
       ...body,
       when: new Date(body.when),
@@ -40,10 +42,10 @@ export class EventsController {
 
   @Patch('/:id')
   async update(
-    @Param('id') id: string,
-    @Body() body: IUpdateEventDto,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() body: UpdateEventDto,
   ): Promise<Event> {
-    const event = await this.repository.findOneBy({ id: parseInt(id) });
+    const event = await this.repository.findOneBy({ id });
     return await this.repository.save({
       ...event,
       ...body,
@@ -53,8 +55,8 @@ export class EventsController {
 
   @Delete('/:id')
   @HttpCode(204)
-  async remove(@Param('id') id: string): Promise<void> {
-    const event = await this.repository.findOneBy({ id: parseInt(id) });
+  async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
+    const event = await this.repository.findOneBy({ id });
     await this.repository.remove(event);
   }
 }
