@@ -10,47 +10,51 @@ import {
 } from '@nestjs/common';
 import { ICreateEventDto, IUpdateEventDto } from './event.dto';
 import { Event } from './event.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Controller('/events')
 export class EventsController {
-  private events: Event[] = [];
+  constructor(
+    @InjectRepository(Event)
+    private readonly repository: Repository<Event>,
+  ) {}
 
   @Get()
-  findAll(): Event[] {
-    return this.events;
+  async findAll(): Promise<Event[]> {
+    return await this.repository.find();
   }
 
   @Get('/:id')
-  findOne(@Param('id') id: string): Event {
-    return this.events.find((event) => event.id === parseInt(id));
+  async findOne(@Param('id') id: string): Promise<Event> {
+    return await this.repository.findOneBy({ id: parseInt(id) });
   }
 
   @Post()
-  create(@Body() body: ICreateEventDto): Event {
-    const event = {
+  async create(@Body() body: ICreateEventDto): Promise<Event> {
+    return await this.repository.save({
       ...body,
       when: new Date(body.when),
-      id: this.events.length + 1,
-    };
-    this.events.push(event);
-    return event;
+    });
   }
 
   @Patch('/:id')
-  update(@Param('id') id: string, @Body() body: IUpdateEventDto): Event {
-    const index = this.events.findIndex((event) => event.id === parseInt(id));
-    this.events[index] = {
-      ...this.events[index],
+  async update(
+    @Param('id') id: string,
+    @Body() body: IUpdateEventDto,
+  ): Promise<Event> {
+    const event = await this.repository.findOneBy({ id: parseInt(id) });
+    return await this.repository.save({
+      ...event,
       ...body,
-      when: body.when ? new Date(body.when) : this.events[index].when,
-    };
-
-    return this.events[index];
+      when: body.when ? new Date(body.when) : event.when,
+    });
   }
 
   @Delete('/:id')
   @HttpCode(204)
-  remove(@Param('id') id: string): void {
-    this.events = this.events.filter((event) => event.id !== parseInt(id));
+  async remove(@Param('id') id: string): Promise<void> {
+    const event = await this.repository.findOneBy({ id: parseInt(id) });
+    await this.repository.remove(event);
   }
 }
