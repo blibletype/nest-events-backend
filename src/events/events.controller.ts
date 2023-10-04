@@ -22,7 +22,7 @@ import {
 import { AuthGuardJwt } from 'src/auth/auth-guard.jwt';
 import { CurrentUser } from 'src/auth/current-user.decorator';
 import { User } from 'src/auth/user.entity';
-import { CreateEventDto, UpdateEventDto } from './event.dto';
+import { CreateEventDto, UpdateEventDto } from './dto/event.dto';
 import { Event } from './event.entity';
 import { ListEvents } from './event.filters';
 import { EventsService } from './events.service';
@@ -75,7 +75,7 @@ export class EventsController {
   @Get('/:id')
   @UseInterceptors(ClassSerializerInterceptor)
   async findOne(@Param('id', ParseIntPipe) id: number): Promise<Event> {
-    const event = await this.eventsService.getEvent(id);
+    const event = await this.eventsService.getEventWithAttendeeCount(id);
 
     if (!event) {
       throw new NotFoundException();
@@ -102,7 +102,7 @@ export class EventsController {
     @Body() body: UpdateEventDto,
     @CurrentUser() user: User,
   ): Promise<Event> {
-    const event = await this.eventsService.getEvent(id);
+    const event = await this.eventsService.findOne(id);
 
     if (!event) {
       throw new NotFoundException();
@@ -125,7 +125,7 @@ export class EventsController {
     @Param('id', ParseIntPipe) id: number,
     @CurrentUser() user: User,
   ): Promise<void> {
-    const event = await this.eventsService.getEvent(id);
+    const event = await this.eventsService.findOne(id);
 
     if (!event) {
       throw new NotFoundException();
