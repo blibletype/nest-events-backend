@@ -1,7 +1,9 @@
 import {
   Body,
+  ClassSerializerInterceptor,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
   HttpCode,
   Logger,
@@ -11,51 +13,52 @@ import {
   Patch,
   Post,
   Query,
+  SerializeOptions,
+  UseGuards,
+  UseInterceptors,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { AuthGuardJwt } from 'src/auth/auth-guard.jwt';
+import { CurrentUser } from 'src/auth/current-user.decorator';
+import { User } from 'src/auth/user.entity';
 import { CreateEventDto, UpdateEventDto } from './event.dto';
 import { Event } from './event.entity';
-import { Attendee } from './attendee.entity';
-import { EventsService } from './events.service';
 import { ListEvents } from './event.filters';
+import { EventsService } from './events.service';
 
 @Controller('/events')
+@SerializeOptions({
+  strategy: 'excludeAll',
+})
 export class EventsController {
   private readonly logger = new Logger(EventsController.name);
 
-  constructor(
-    @InjectRepository(Event)
-    private readonly repository: Repository<Event>,
-    @InjectRepository(Attendee)
-    private readonly attendeeRepository: Repository<Attendee>,
-    private readonly eventsService: EventsService,
-  ) {}
+  constructor(private readonly eventsService: EventsService) {}
 
-  @Get('/practice/:id')
-  async practice(@Param('id', ParseIntPipe) id: number): Promise<Event> {
-    // const event = await this.repository.findOne({
-    //   where: { id },
-    //   relations: ['attendees'],
-    // });
-    // this.logger.debug(`Event: ${JSON.stringify(event)}`);
-    // return event;
-    const event = await this.repository.findOne({
-      where: { id },
-      relations: ['attendees'],
-    });
-    const attendee = new Attendee();
-    attendee.name = 'Name';
-    // attendee.event = event;
-    event.attendees.push(attendee);
-    await this.repository.save(event);
-    return event;
-  }
+  // @Get('/practice/:id')
+  // async practice(@Param('id', ParseIntPipe) id: number): Promise<Event> {
+  //   // const event = await this.repository.findOne({
+  //   //   where: { id },
+  //   //   relations: ['attendees'],
+  //   // });
+  //   // this.logger.debug(`Event: ${JSON.stringify(event)}`);
+  //   // return event;
+  //   const event = await this.repository.findOne({
+  //     where: { id },
+  //     relations: ['attendees'],
+  //   });
+  //   const attendee = new Attendee();
+  //   attendee.name = 'Name';
+  //   // attendee.event = event;
+  //   event.attendees.push(attendee);
+  //   await this.repository.save(event);
+  //   return event;
+  // }
 
   @Get()
   @UsePipes(new ValidationPipe({ transform: true }))
+  @UseInterceptors(ClassSerializerInterceptor)
   async findAll(@Query() filter: ListEvents) {
     const events =
       await this.eventsService.getEventsWithAttendeesCountFilteredPaginated(
@@ -70,6 +73,7 @@ export class EventsController {
   }
 
   @Get('/:id')
+  @UseInterceptors(ClassSerializerInterceptor)
   async findOne(@Param('id', ParseIntPipe) id: number): Promise<Event> {
     const event = await this.eventsService.getEvent(id);
 
@@ -81,32 +85,59 @@ export class EventsController {
   }
 
   @Post()
-  async create(@Body() body: CreateEventDto): Promise<Event> {
-    return await this.repository.save({
-      ...body,
-      when: new Date(body.when),
-    });
+  @UseGuards(AuthGuardJwt)
+  @UseInterceptors(ClassSerializerInterceptor)
+  async create(
+    @Body() body: CreateEventDto,
+    @CurrentUser() user: User,
+  ): Promise<Event> {
+    return await this.eventsService.createEvent(body, user);
   }
 
   @Patch('/:id')
+  @UseGuards(AuthGuardJwt)
+  @UseInterceptors(ClassSerializerInterceptor)
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() body: UpdateEventDto,
+    @CurrentUser() user: User,
   ): Promise<Event> {
-    const event = await this.repository.findOneBy({ id });
-    return await this.repository.save({
-      ...event,
-      ...body,
-      when: body.when ? new Date(body.when) : event.when,
-    });
+    const event = await this.eventsService.getEvent(id);
+
+    if (!event) {
+      throw new NotFoundException();
+    }
+
+    if (event.organizerId !== user.id) {
+      throw new ForbiddenException(
+        null,
+        'You are not allowed to change this event',
+      );
+    }
+
+    return await this.eventsService.updateEvent(event, body);
   }
 
   @Delete('/:id')
   @HttpCode(204)
-  async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
-    const result = await this.eventsService.removeEvent(id);
-    if (result?.affected !== 1) {
+  @UseGuards(AuthGuardJwt)
+  async remove(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: User,
+  ): Promise<void> {
+    const event = await this.eventsService.getEvent(id);
+
+    if (!event) {
       throw new NotFoundException();
     }
+
+    if (event.organizerId !== user.id) {
+      throw new ForbiddenException(
+        null,
+        'You are not allowed to remove this event',
+      );
+    }
+
+    await this.eventsService.removeEvent(id);
   }
 }
