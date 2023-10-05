@@ -1,4 +1,4 @@
-import { User } from 'src/auth/users/user.entity';
+import { User } from '../auth/users/user.entity';
 import {
   Column,
   Entity,
@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import { Attendee } from './attendee.entity';
 import { Expose } from 'class-transformer';
-import { PaginationResult } from 'src/pagination/paginator';
+import { PaginationResult } from '../pagination/paginator';
 
 @Entity('events')
 export class Event {
