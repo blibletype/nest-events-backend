@@ -19,9 +19,9 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { AuthGuardJwt } from 'src/auth/auth-guard.jwt';
-import { CurrentUser } from 'src/auth/current-user.decorator';
-import { User } from 'src/auth/user.entity';
+import { AuthGuardJwt } from 'src/auth/guards/auth-guard.jwt';
+import { CurrentUser } from 'src/auth/users/current-user.decorator';
+import { User } from 'src/auth/users/user.entity';
 import { CreateEventDto, UpdateEventDto } from './dto/event.dto';
 import { Event } from './event.entity';
 import { ListEvents } from './event.filters';
@@ -35,26 +35,6 @@ export class EventsController {
   private readonly logger = new Logger(EventsController.name);
 
   constructor(private readonly eventsService: EventsService) {}
-
-  // @Get('/practice/:id')
-  // async practice(@Param('id', ParseIntPipe) id: number): Promise<Event> {
-  //   // const event = await this.repository.findOne({
-  //   //   where: { id },
-  //   //   relations: ['attendees'],
-  //   // });
-  //   // this.logger.debug(`Event: ${JSON.stringify(event)}`);
-  //   // return event;
-  //   const event = await this.repository.findOne({
-  //     where: { id },
-  //     relations: ['attendees'],
-  //   });
-  //   const attendee = new Attendee();
-  //   attendee.name = 'Name';
-  //   // attendee.event = event;
-  //   event.attendees.push(attendee);
-  //   await this.repository.save(event);
-  //   return event;
-  // }
 
   @Get()
   @UsePipes(new ValidationPipe({ transform: true }))
