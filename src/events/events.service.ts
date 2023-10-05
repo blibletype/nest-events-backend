@@ -172,7 +172,7 @@ export class EventsService {
     userId: number,
   ): SelectQueryBuilder<Event> {
     return this.getEventsBaseQuery()
-      .leftJoinAndSelect('e.attendess', 'a')
+      .leftJoinAndSelect('e.attendees', 'a')
       .where('a.userId = :userId', { userId });
   }
 
