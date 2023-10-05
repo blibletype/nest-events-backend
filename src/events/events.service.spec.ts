@@ -11,6 +11,19 @@ describe('EventsService', () => {
   let deleteQb;
 
   beforeEach(async () => {
+    selectQb = {
+      delete: jest.fn().mockReturnValue(deleteQb),
+      where: jest.fn(),
+      execute: jest.fn(),
+      orderBy: jest.fn(),
+      leftJoinAndSelect: jest.fn(),
+    };
+
+    deleteQb = {
+      where: jest.fn(),
+      execute: jest.fn(),
+    };
+
     const module = await Test.createTestingModule({
       providers: [
         EventsService,
@@ -29,19 +42,6 @@ describe('EventsService', () => {
 
     service = module.get<EventsService>(EventsService);
     repository = module.get<Repository<Event>>(getRepositoryToken(Event));
-
-    selectQb = {
-      delete: jest.fn().mockReturnValue(deleteQb),
-      where: jest.fn(),
-      execute: jest.fn(),
-      orderBy: jest.fn(),
-      leftJoinAndSelect: jest.fn(),
-    };
-
-    deleteQb = {
-      where: jest.fn(),
-      execute: jest.fn(),
-    };
   });
 
   describe('updateEvent', () => {
@@ -65,8 +65,10 @@ describe('EventsService', () => {
         repository,
         'createQueryBuilder',
       );
-      const deleteSpy = jest.spyOn(selectQb, 'delete');
-      const whereSpy = jest.spyOn(deleteQb, 'where');
+      const deleteSpy = jest
+        .spyOn(selectQb, 'delete')
+        .mockReturnValue(deleteQb);
+      const whereSpy = jest.spyOn(deleteQb, 'where').mockReturnValue(deleteQb);
       const executeSpy = jest.spyOn(deleteQb, 'execute');
 
       expect(service.removeEvent(1)).resolves.toBe(undefined);
