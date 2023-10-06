@@ -2,10 +2,21 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type EntityWithId {
+  id: Int!
+}
+
 type Teacher {
   id: Float
   name: String!
+  gender: Gender!
   subjects: [Subject!]!
+}
+
+enum Gender {
+  Male
+  Female
+  Other
 }
 
 type Subject {
@@ -20,8 +31,15 @@ type Query {
 
 type Mutation {
   teacherAdd(body: TeacherAddDto!): Teacher!
+  teacherEdit(id: Int!, body: TeacherEditDto!): Teacher!
+  teacherDelete(id: Int!): EntityWithId!
 }
 
 input TeacherAddDto {
   name: String!
+  gender: Gender!
+}
+
+input TeacherEditDto {
+  name: String
 }

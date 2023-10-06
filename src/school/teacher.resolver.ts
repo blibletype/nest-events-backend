@@ -1,11 +1,24 @@
-import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
+import {
+  Args,
+  Int,
+  Mutation,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
+} from '@nestjs/graphql';
 import { Teacher } from './teacher.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TeacherAddDto } from './dto/teacher-add.dto';
+import { Logger } from '@nestjs/common';
+import { TeacherEditDto } from './dto/teacher-edit.dto';
+import { EntityWithId } from './school.types';
 
 @Resolver(() => Teacher)
 export class TeacherResolver {
+  private readonly logger = new Logger(TeacherResolver.name);
+
   constructor(
     @InjectRepository(Teacher)
     private readonly teacherRepository: Repository<Teacher>,
@@ -13,9 +26,7 @@ export class TeacherResolver {
 
   @Query(() => [Teacher])
   public async teachers(): Promise<Teacher[]> {
-    return await this.teacherRepository.find({
-      relations: ['subjects'],
-    });
+    return await this.teacherRepository.find();
   }
 
   @Query(() => Teacher)
@@ -24,7 +35,6 @@ export class TeacherResolver {
   ): Promise<Teacher> {
     return await this.teacherRepository.findOneOrFail({
       where: { id },
-      relations: ['subjects'],
     });
   }
 
@@ -33,6 +43,39 @@ export class TeacherResolver {
     @Args('body', { type: () => TeacherAddDto })
     body: TeacherAddDto,
   ): Promise<Teacher> {
-    return await this.teacherRepository.save(body);
+    return await this.teacherRepository.save(new Teacher(body));
+  }
+
+  @Mutation(() => Teacher, { name: 'teacherEdit' })
+  public async edit(
+    @Args('id', { type: () => Int })
+    id: number,
+    @Args('body', { type: () => TeacherEditDto })
+    body: TeacherEditDto,
+  ): Promise<Teacher> {
+    const teacher = await this.teacherRepository.findOneOrFail({
+      where: { id },
+    });
+    return await this.teacherRepository.save(
+      new Teacher(Object.assign(teacher, body)),
+    );
+  }
+
+  @Mutation(() => EntityWithId, { name: 'teacherDelete' })
+  public async delete(
+    @Args('id', { type: () => Int })
+    id: number,
+  ): Promise<EntityWithId> {
+    const teacher = await this.teacherRepository.findOneOrFail({
+      where: { id },
+    });
+    await this.teacherRepository.remove(teacher);
+    return new EntityWithId(id);
+  }
+
+  @ResolveField('subjects')
+  public async subjects(@Parent() teacher: Teacher) {
+    this.logger.debug(`@ResolveField subject was called`);
+    return await teacher.subjects;
   }
 }
