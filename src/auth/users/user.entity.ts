@@ -10,15 +10,23 @@ import { Profile } from './profile.entity';
 import { Event } from '../../events/event.entity';
 import { Expose } from 'class-transformer';
 import { Attendee } from '../../events/attendee.entity';
+import { Field, Int, ObjectType } from '@nestjs/graphql';
 
 @Entity('users')
+@ObjectType()
 export class User {
+  constructor(partial?: Partial<User>) {
+    Object.assign(this, partial);
+  }
+
   @PrimaryGeneratedColumn()
   @Expose()
+  @Field(() => Int)
   id: number;
 
   @Column({ unique: true })
   @Expose()
+  @Field()
   username: string;
 
   @Column()
@@ -26,14 +34,17 @@ export class User {
 
   @Column({ unique: true })
   @Expose()
+  @Field()
   email: string;
 
   @Column()
   @Expose()
+  @Field()
   firstName: string;
 
   @Column()
   @Expose()
+  @Field()
   lastName: string;
 
   @OneToOne(() => Profile, { nullable: true })

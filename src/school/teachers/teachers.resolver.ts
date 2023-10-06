@@ -10,14 +10,15 @@ import {
 import { Teacher } from './teacher.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { TeacherAddDto } from './dto/teacher-add.dto';
-import { Logger } from '@nestjs/common';
-import { TeacherEditDto } from './dto/teacher-edit.dto';
-import { EntityWithId } from './school.types';
+import { TeacherAddDto } from '../dto/teacher-add.dto';
+import { Logger, UseGuards } from '@nestjs/common';
+import { TeacherEditDto } from '../dto/teacher-edit.dto';
+import { EntityWithId } from '../school.types';
+import { AuthGuardJwtGql } from 'src/auth/guards/auth-guard-jwt.gql';
 
 @Resolver(() => Teacher)
-export class TeacherResolver {
-  private readonly logger = new Logger(TeacherResolver.name);
+export class TeachersResolver {
+  private readonly logger = new Logger(TeachersResolver.name);
 
   constructor(
     @InjectRepository(Teacher)
@@ -39,6 +40,7 @@ export class TeacherResolver {
   }
 
   @Mutation(() => Teacher, { name: 'teacherAdd' })
+  @UseGuards(AuthGuardJwtGql)
   public async add(
     @Args('body', { type: () => TeacherAddDto })
     body: TeacherAddDto,

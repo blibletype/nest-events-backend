@@ -2,14 +2,16 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type EntityWithId {
+type User {
   id: Int!
+  username: String!
+  email: String!
+  firstName: String!
+  lastName: String!
 }
 
-type Course {
-  id: Int
-  subject: Subject
-  teacher: Teacher
+type EntityWithId {
+  id: Int!
 }
 
 type Teacher {
@@ -26,21 +28,39 @@ enum Gender {
   Other
 }
 
+type Course {
+  id: Int
+  subject: Subject
+  teacher: Teacher
+}
+
 type Subject {
   id: Float!
   name: String!
   courses: [Course!]
+  teachers: [Teacher!]!
+}
+
+type TokenDto {
+  token: String!
 }
 
 type Query {
+  me: User
   teachers: [Teacher!]!
   teacher(id: Int!): Teacher!
 }
 
 type Mutation {
+  login(body: LoginDto!): TokenDto!
   teacherAdd(body: TeacherAddDto!): Teacher!
   teacherEdit(id: Int!, body: TeacherEditDto!): Teacher!
   teacherDelete(id: Int!): EntityWithId!
+}
+
+input LoginDto {
+  username: String!
+  password: String!
 }
 
 input TeacherAddDto {

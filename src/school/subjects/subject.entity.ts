@@ -1,3 +1,4 @@
+import { Field, ObjectType } from '@nestjs/graphql';
 import {
   Column,
   Entity,
@@ -6,9 +7,8 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Teacher } from './teacher.entity';
-import { Field, InputType, ObjectType } from '@nestjs/graphql';
-import { Course } from './course.entity';
+import { Course } from '../courses/course.entity';
+import { Teacher } from '../teachers/teacher.entity';
 
 @Entity()
 @ObjectType()

@@ -6,9 +6,9 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Subject } from './subject.entity';
-import { Gender } from './school.types';
-import { Course } from './course.entity';
+import { Subject } from '../subjects/subject.entity';
+import { Gender } from '../school.types';
+import { Course } from '../courses/course.entity';
 
 @Entity()
 @ObjectType()

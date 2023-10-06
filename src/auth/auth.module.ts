@@ -7,6 +7,10 @@ import { JwtModule } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './strategy/jwt.strategy';
 import { UsersController } from './users/users.controller';
+import { AuthResolver } from './auth.resolver';
+import { UsersResolver } from './users/users.resolver';
+import { UsersService } from './users/users.service';
+import { UserDoesNotExistConstraint } from './validation/user-does-not-exist.constraint';
 
 @Module({
   imports: [
@@ -20,7 +24,15 @@ import { UsersController } from './users/users.controller';
       }),
     }),
   ],
-  providers: [LocalStrategy, AuthService, JwtStrategy],
+  providers: [
+    LocalStrategy,
+    AuthService,
+    JwtStrategy,
+    AuthResolver,
+    UsersResolver,
+    UsersService,
+    UserDoesNotExistConstraint,
+  ],
   controllers: [AuthController, UsersController],
 })
 export class AuthModule {}
