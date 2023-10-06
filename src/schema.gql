@@ -53,6 +53,7 @@ type Query {
 
 type Mutation {
   login(body: LoginDto!): TokenDto!
+  userAdd(body: UserAddDto!): User!
   teacherAdd(body: TeacherAddDto!): Teacher!
   teacherEdit(id: Int!, body: TeacherEditDto!): Teacher!
   teacherDelete(id: Int!): EntityWithId!
@@ -61,6 +62,15 @@ type Mutation {
 input LoginDto {
   username: String!
   password: String!
+}
+
+input UserAddDto {
+  username: String!
+  password: String!
+  retypedPassword: String!
+  firstName: String!
+  lastName: String!
+  email: String!
 }
 
 input TeacherAddDto {
