@@ -5,7 +5,7 @@
 type Teacher {
   id: Float
   name: String!
-  subjects: [Subject!]!
+  subjects: [Subject!]
 }
 
 type Subject {
@@ -13,7 +13,22 @@ type Subject {
   name: String!
 }
 
+input TeacherBody {
+  id: Float
+  name: String!
+  subjects: [SubjectBody!]
+}
+
+input SubjectBody {
+  id: Float!
+  name: String!
+}
+
 type Query {
   teachers: [Teacher!]!
   teacher(id: Int!): Teacher!
+}
+
+type Mutation {
+  teacherAdd(body: TeacherBody!): Teacher!
 }
