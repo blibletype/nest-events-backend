@@ -2,6 +2,7 @@ import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { Teacher } from './teacher.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { TeacherAddDto } from './dto/teacher-add.dto';
 
 @Resolver(() => Teacher)
 export class TeacherResolver {
@@ -29,9 +30,9 @@ export class TeacherResolver {
 
   @Mutation(() => Teacher, { name: 'teacherAdd' })
   public async add(
-    @Args('body', { type: () => Teacher })
-    teacher: Teacher,
+    @Args('body', { type: () => TeacherAddDto })
+    body: TeacherAddDto,
   ): Promise<Teacher> {
-    return await this.teacherRepository.save(teacher);
+    return await this.teacherRepository.save(body);
   }
 }

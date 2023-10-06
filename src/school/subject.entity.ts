@@ -10,7 +10,6 @@ import { Field, InputType, ObjectType } from '@nestjs/graphql';
 
 @Entity()
 @ObjectType()
-@InputType('SubjectBody')
 export class Subject {
   @PrimaryGeneratedColumn()
   @Field()
