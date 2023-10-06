@@ -6,11 +6,18 @@ type EntityWithId {
   id: Int!
 }
 
+type Course {
+  id: Int
+  subject: Subject
+  teacher: Teacher
+}
+
 type Teacher {
   id: Float
   name: String!
   gender: Gender!
   subjects: [Subject!]!
+  courses: [Course!]
 }
 
 enum Gender {
@@ -22,6 +29,7 @@ enum Gender {
 type Subject {
   id: Float!
   name: String!
+  courses: [Course!]
 }
 
 type Query {
