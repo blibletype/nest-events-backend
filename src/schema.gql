@@ -1,0 +1,19 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Teacher {
+  id: Float
+  name: String!
+  subjects: [Subject!]!
+}
+
+type Subject {
+  id: Float!
+  name: String!
+}
+
+type Query {
+  teachers: [Teacher!]!
+  teacher(id: Int!): Teacher!
+}

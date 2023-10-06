@@ -8,6 +8,9 @@ import ormConfigProd from './config/orm.config.prod';
 import { EventsModule } from './events/events.module';
 import { SchoolModule } from './school/school.module';
 import { AuthModule } from './auth/auth.module';
+import { GraphQLModule } from '@nestjs/graphql';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -20,6 +23,11 @@ import { AuthModule } from './auth/auth.module';
     TypeOrmModule.forRootAsync({
       useFactory:
         process.env.NODE_ENV !== 'production' ? ormConfig : ormConfigProd,
+    }),
+    GraphQLModule.forRoot<ApolloDriverConfig>({
+      driver: ApolloDriver,
+      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+      playground: true,
     }),
     AuthModule,
     EventsModule,
