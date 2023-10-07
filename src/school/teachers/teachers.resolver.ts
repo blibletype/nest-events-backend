@@ -14,7 +14,7 @@ import { TeacherAddDto } from '../dto/teacher-add.dto';
 import { Logger, UseGuards } from '@nestjs/common';
 import { TeacherEditDto } from '../dto/teacher-edit.dto';
 import { EntityWithId } from '../school.types';
-import { AuthGuardJwtGql } from 'src/auth/guards/auth-guard-jwt.gql';
+import { AuthGuardJwtGql } from '../../auth/guards/auth-guard-jwt.gql';
 
 @Resolver(() => Teacher)
 export class TeachersResolver {
