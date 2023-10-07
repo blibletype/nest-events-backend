@@ -1,0 +1,91 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type User {
+  id: Int!
+  username: String!
+  email: String!
+  firstName: String!
+  lastName: String!
+}
+
+type EntityWithId {
+  id: Int!
+}
+
+type Teacher {
+  id: Float
+  name: String!
+  gender: Gender!
+  subjects: [Subject!]!
+  courses: [Course!]
+}
+
+enum Gender {
+  Male
+  Female
+  Other
+}
+
+type PaginatedTeachers {
+  first: Float
+  last: Float
+  limit: Float
+  total: Float
+  data: [Teacher!]
+}
+
+type Course {
+  id: Int
+  subject: Subject
+  teacher: Teacher
+}
+
+type Subject {
+  id: Float!
+  name: String!
+  courses: [Course!]
+  teachers: [Teacher!]!
+}
+
+type TokenDto {
+  token: String!
+}
+
+type Query {
+  me: User
+  teachers: PaginatedTeachers!
+  teacher(id: Int!): Teacher!
+}
+
+type Mutation {
+  login(body: LoginDto!): TokenDto!
+  userAdd(body: UserAddDto!): User!
+  teacherAdd(body: TeacherAddDto!): Teacher!
+  teacherEdit(id: Int!, body: TeacherEditDto!): Teacher!
+  teacherDelete(id: Int!): EntityWithId!
+}
+
+input LoginDto {
+  username: String!
+  password: String!
+}
+
+input UserAddDto {
+  username: String!
+  password: String!
+  retypedPassword: String!
+  firstName: String!
+  lastName: String!
+  email: String!
+}
+
+input TeacherAddDto {
+  name: String!
+  gender: Gender!
+}
+
+input TeacherEditDto {
+  name: String
+}

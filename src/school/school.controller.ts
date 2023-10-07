@@ -1,11 +1,11 @@
 import { Controller, Post } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Subject } from './subject.entity';
-import { Teacher } from './teacher.entity';
+import { Subject } from './subjects/subject.entity';
+import { Teacher } from './teachers/teacher.entity';
 
 @Controller('school')
-export class TrainingController {
+export class SchoolController {
   constructor(
     @InjectRepository(Subject)
     private readonly subjectRepository: Repository<Subject>,
