@@ -7,7 +7,7 @@ import {
   ResolveField,
   Resolver,
 } from '@nestjs/graphql';
-import { Teacher } from './teacher.entity';
+import { PaginatedTeachers, Teacher } from './teacher.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TeacherAddDto } from '../dto/teacher-add.dto';
@@ -15,6 +15,7 @@ import { Logger, UseGuards } from '@nestjs/common';
 import { TeacherEditDto } from '../dto/teacher-edit.dto';
 import { EntityWithId } from '../school.types';
 import { AuthGuardJwtGql } from '../../auth/guards/auth-guard-jwt.gql';
+import { paginate } from '../../pagination/paginator';
 
 @Resolver(() => Teacher)
 export class TeachersResolver {
@@ -25,9 +26,12 @@ export class TeachersResolver {
     private readonly teacherRepository: Repository<Teacher>,
   ) {}
 
-  @Query(() => [Teacher])
-  public async teachers(): Promise<Teacher[]> {
-    return await this.teacherRepository.find();
+  @Query(() => PaginatedTeachers)
+  public async teachers(): Promise<PaginatedTeachers> {
+    return paginate<Teacher, PaginatedTeachers>(
+      this.teacherRepository.createQueryBuilder(),
+      PaginatedTeachers,
+    );
   }
 
   @Query(() => Teacher)

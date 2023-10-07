@@ -9,6 +9,7 @@ import {
 import { Subject } from '../subjects/subject.entity';
 import { Gender } from '../school.types';
 import { Course } from '../courses/course.entity';
+import { Paginated } from 'src/pagination/paginator';
 
 @Entity()
 @ObjectType()
@@ -41,3 +42,6 @@ export class Teacher {
   @Field(() => [Course], { nullable: true })
   courses: Promise<Course[]>;
 }
+
+@ObjectType()
+export class PaginatedTeachers extends Paginated<Teacher>(Teacher) {}

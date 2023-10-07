@@ -28,6 +28,14 @@ enum Gender {
   Other
 }
 
+type PaginatedTeachers {
+  first: Float
+  last: Float
+  limit: Float
+  total: Float
+  data: [Teacher!]
+}
+
 type Course {
   id: Int
   subject: Subject
@@ -47,7 +55,7 @@ type TokenDto {
 
 type Query {
   me: User
-  teachers: [Teacher!]!
+  teachers: PaginatedTeachers!
   teacher(id: Int!): Teacher!
 }
 
